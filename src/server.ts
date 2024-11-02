@@ -1,8 +1,5 @@
 import { Server } from "http";
-// import app from './app'
-
-import express from "express";
-const app = express();
+import app from "./app";
 
 const port = 5000;
 
