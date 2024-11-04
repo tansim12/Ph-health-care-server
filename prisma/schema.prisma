@@ -28,10 +28,10 @@ enum UserRole {
 model User {
   id String @id @default(uuid())
  email String @unique
- role UserRole
- status UserStatus
+ role UserRole @default(PATIENT)
+ status UserStatus @default(ACTIVE)
  password String
- needPasswordChange Boolean
+ needPasswordChange Boolean @default(true)
  createdAt DateTime @default(now())
  updatedAt DateTime @updatedAt
 
@@ -42,9 +42,9 @@ model Admin {
   id String @id @default(uuid())
   name String
  email String @unique
-profilePhoto String
+profilePhoto String?
  contactNumber String
- isDeleted Boolean
+ isDeleted Boolean @default(false)
  createdAt DateTime @default(now())
  updatedAt DateTime @updatedAt
 
