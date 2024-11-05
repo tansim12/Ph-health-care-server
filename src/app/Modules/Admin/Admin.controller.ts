@@ -16,7 +16,33 @@ const findAllAdmin: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+const getSingleAdmin: RequestHandler = async (req, res, next) => {
+  try {
+    const result = await adminService.getSingleAdminDB(req?.params?.id);
+    res
+      .status(200)
+      .send(
+        successResponse(result, 200, "Find single admin  successfully done")
+      );
+  } catch (error) {
+    next(error);
+  }
+};
+const updateAdminInfo: RequestHandler = async (req, res, next) => {
+  try {
+    const result = await adminService.updateAdminInfoDB(req?.params?.id,req?.body);
+    res
+      .status(200)
+      .send(
+        successResponse(result, 200, "Find single admin data update  successfully done")
+      );
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const adminController = {
   findAllAdmin,
+  getSingleAdmin,
+  updateAdminInfo
 };
