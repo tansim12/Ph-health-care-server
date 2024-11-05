@@ -6,5 +6,6 @@ const router = express.Router();
 router.get("/", adminController.findAllAdmin);
 router.get("/:id", adminController.getSingleAdmin);
 router.put("/:id", adminController.updateAdminInfo);
+router.delete("/:id", adminController.deleteUserAndAdmin);
 
 export const adminRouter = router;

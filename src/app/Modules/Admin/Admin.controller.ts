@@ -30,11 +30,30 @@ const getSingleAdmin: RequestHandler = async (req, res, next) => {
 };
 const updateAdminInfo: RequestHandler = async (req, res, next) => {
   try {
-    const result = await adminService.updateAdminInfoDB(req?.params?.id,req?.body);
+    const result = await adminService.updateAdminInfoDB(
+      req?.params?.id,
+      req?.body
+    );
     res
       .status(200)
       .send(
-        successResponse(result, 200, "Find single admin data update  successfully done")
+        successResponse(
+          result,
+          200,
+          "Find single admin data update  successfully done"
+        )
+      );
+  } catch (error) {
+    next(error);
+  }
+};
+const deleteUserAndAdmin: RequestHandler = async (req, res, next) => {
+  try {
+    const result = await adminService.deleteUserAndAdminDB(req?.params?.id);
+    res
+      .status(200)
+      .send(
+        successResponse(result, 200, "Admin and user delete successfully done")
       );
   } catch (error) {
     next(error);
@@ -44,5 +63,6 @@ const updateAdminInfo: RequestHandler = async (req, res, next) => {
 export const adminController = {
   findAllAdmin,
   getSingleAdmin,
-  updateAdminInfo
+  updateAdminInfo,
+  deleteUserAndAdmin,
 };

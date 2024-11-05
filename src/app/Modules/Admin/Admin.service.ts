@@ -86,9 +86,39 @@ const updateAdminInfoDB = async (id: string, body: Partial<Admin>) => {
     result,
   };
 };
+const deleteUserAndAdminDB = async (id: string) => {
+  await prisma.admin.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+
+  const result = await prisma.$transaction(async (tc) => {
+    const deleteAdmin = await tc.admin.delete({
+      where: {
+        id,
+      },
+    });
+
+    await tc.user.delete({
+      where: {
+        email: deleteAdmin?.email,
+      },
+    });
+
+    return {
+      deleteAdmin,
+    };
+  });
+
+  return {
+    result,
+  };
+};
 
 export const adminService = {
   findAllAdminDB,
   getSingleAdminDB,
   updateAdminInfoDB,
+  deleteUserAndAdminDB,
 };
