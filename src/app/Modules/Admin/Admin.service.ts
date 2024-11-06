@@ -1,4 +1,4 @@
-import { Admin, Prisma, PrismaClient } from "@prisma/client";
+import { Admin, Prisma, PrismaClient, UserStatus } from "@prisma/client";
 import { paginationHelper } from "../../helper/paginationHelper";
 import { adminSearchAbleFields } from "./Admin.const";
 
@@ -29,7 +29,9 @@ const findAllAdminDB = async (queryObj: any, options: any) => {
       })),
     });
   }
-
+  andCondition.push({
+    isDeleted: false,
+  });
   const whereConditions: Prisma.AdminWhereInput = { AND: andCondition };
 
   const result = await prisma.admin.findMany({
@@ -64,6 +66,7 @@ const getSingleAdminDB = async (id: string) => {
   const result = await prisma.admin.findUnique({
     where: {
       id,
+      isDeleted: false,
     },
   });
   return {
@@ -74,6 +77,7 @@ const updateAdminInfoDB = async (id: string, body: Partial<Admin>) => {
   await prisma.admin.findUniqueOrThrow({
     where: {
       id,
+      isDeleted: false,
     },
   });
   const result = await prisma.admin.update({
@@ -90,6 +94,7 @@ const deleteUserAndAdminDB = async (id: string) => {
   await prisma.admin.findUniqueOrThrow({
     where: {
       id,
+      isDeleted: false,
     },
   });
 
@@ -97,6 +102,7 @@ const deleteUserAndAdminDB = async (id: string) => {
     const deleteAdmin = await tc.admin.delete({
       where: {
         id,
+        isDeleted: false,
       },
     });
 
@@ -115,10 +121,47 @@ const deleteUserAndAdminDB = async (id: string) => {
     result,
   };
 };
+const softDeleteUserAndAdminDB = async (id: string) => {
+  await prisma.admin.findUniqueOrThrow({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
+
+  const result = await prisma.$transaction(async (tc) => {
+    const deleteAdmin = await tc.admin.update({
+      where: {
+        id,
+      },
+      data: {
+        isDeleted: true,
+      },
+    });
+
+    await tc.user.update({
+      where: {
+        email: deleteAdmin?.email,
+      },
+      data: {
+        status: UserStatus.DELETED,
+      },
+    });
+
+    return {
+      deleteAdmin,
+    };
+  });
+
+  return {
+    result,
+  };
+};
 
 export const adminService = {
   findAllAdminDB,
   getSingleAdminDB,
   updateAdminInfoDB,
   deleteUserAndAdminDB,
+  softDeleteUserAndAdminDB,
 };

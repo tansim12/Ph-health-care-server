@@ -10,7 +10,6 @@ const findAllAdmin: RequestHandler = async (req, res, next) => {
     const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
     const result = await adminService.findAllAdminDB(filters, options);
     res
-      .status(200)
       .send(successResponse(result, 200, "Find all admin  Successfully Done"));
   } catch (error) {
     next(error);
@@ -19,11 +18,9 @@ const findAllAdmin: RequestHandler = async (req, res, next) => {
 const getSingleAdmin: RequestHandler = async (req, res, next) => {
   try {
     const result = await adminService.getSingleAdminDB(req?.params?.id);
-    res
-      .status(200)
-      .send(
-        successResponse(result, 200, "Find single admin  successfully done")
-      );
+    res.send(
+      successResponse(result, 200, "Find single admin  successfully done")
+    );
   } catch (error) {
     next(error);
   }
@@ -34,15 +31,13 @@ const updateAdminInfo: RequestHandler = async (req, res, next) => {
       req?.params?.id,
       req?.body
     );
-    res
-      .status(200)
-      .send(
-        successResponse(
-          result,
-          200,
-          "Find single admin data update  successfully done"
-        )
-      );
+    res.send(
+      successResponse(
+        result,
+        200,
+        "Find single admin data update  successfully done"
+      )
+    );
   } catch (error) {
     next(error);
   }
@@ -50,11 +45,19 @@ const updateAdminInfo: RequestHandler = async (req, res, next) => {
 const deleteUserAndAdmin: RequestHandler = async (req, res, next) => {
   try {
     const result = await adminService.deleteUserAndAdminDB(req?.params?.id);
-    res
-      .status(200)
-      .send(
-        successResponse(result, 200, "Admin and user delete successfully done")
-      );
+    res.send(
+      successResponse(result, 200, "Admin and user delete successfully done")
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+const softDeleteUserAndAdmin: RequestHandler = async (req, res, next) => {
+  try {
+    const result = await adminService.softDeleteUserAndAdminDB(req?.params?.id);
+    res.send(
+      successResponse(result, 200, "Admin and user delete successfully done")
+    );
   } catch (error) {
     next(error);
   }
@@ -65,4 +68,5 @@ export const adminController = {
   getSingleAdmin,
   updateAdminInfo,
   deleteUserAndAdmin,
+  softDeleteUserAndAdmin,
 };
