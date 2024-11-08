@@ -9,7 +9,7 @@ const validationMiddleWare = (zodSchema: AnyZodObject) => {
         cookies:req.cookies
       });
 
-      next();
+      return next();
     } catch (error) {
       next(error);
     }
