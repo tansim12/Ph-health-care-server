@@ -1,15 +1,11 @@
 import express, { Application, Request, Response } from "express";
-import cors from "cors";
 import { userRouter } from "./app/Modules/User/User.route";
 import { adminRouter } from "./app/Modules/Admin/Admin.route";
 import globalErrorHandler from "./app/Error-Handler/globalErrorHandler";
+import normalMiddleware from "./app/middleware/normalMiddleware";
 
 const app: Application = express();
-app.use(cors());
-
-//parser
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+normalMiddleware(app);
 
 app.get("/", (req: Request, res: Response) => {
   res.send({
@@ -20,8 +16,6 @@ app.get("/", (req: Request, res: Response) => {
 app.use("/api/user", userRouter);
 app.use("/api/admin", adminRouter);
 
-
-
 app.all("*", (req: Request, res: Response, next) => {
   const error = new Error(`Can't find ${req.url} on the server`);
   next(error);
@@ -31,5 +25,3 @@ app.all("*", (req: Request, res: Response, next) => {
 app.use(globalErrorHandler);
 
 export default app;
-
-

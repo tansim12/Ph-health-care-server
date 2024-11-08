@@ -74,6 +74,8 @@ const getSingleAdminDB = async (id: string) => {
   };
 };
 const updateAdminInfoDB = async (id: string, body: Partial<Admin>) => {
+  console.log(6);
+  
   await prisma.admin.findUniqueOrThrow({
     where: {
       id,
