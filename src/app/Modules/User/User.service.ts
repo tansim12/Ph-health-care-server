@@ -20,7 +20,6 @@ const adminCreateDB = async (body: any) => {
     role: UserRole.ADMIN,
   };
 
-  console.log({ userData, body });
 
   const result = await prisma.$transaction(async (tnx) => {
     await tnx.user.create({

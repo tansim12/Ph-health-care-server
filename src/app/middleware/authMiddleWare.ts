@@ -1,76 +1,67 @@
-// import { NextFunction, Request, Response } from "express";
-// import jwt, { JwtPayload } from "jsonwebtoken";
-// import dotenv from "dotenv";
-// import AppError from "../Error-Handle/AppError";
-// import httpStatus from "http-status";
-// import { UserModel } from "../Module/User/User.model";
-// import { TUserRole } from "../Module/User/User.interface";
-// import { USER_STATUS } from "../Module/User/User.const";
+import { NextFunction, Request, Response } from "express";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import dotenv from "dotenv";
 
-// dotenv.config();
+import { StatusCodes } from "http-status-codes";
 
-// const handleUnauthorizedError = (message: string, next: NextFunction) => {
-//   const error = new AppError(httpStatus.UNAUTHORIZED, message);
-//   next(error);
-// };
+import prisma from "../shared/prisma";
+import { User, UserRole, UserStatus } from "@prisma/client";
+import ApiError from "../Error-Handler/ApiError";
+import config from "../config";
 
-// export const authMiddleWare = (...requiredRoles: TUserRole[]) => {
-//   return async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//       const token = req.headers.authorization?.split(" ")[1];
+dotenv.config();
 
-//       if (!token) {
-//         return handleUnauthorizedError(
-//           "You have no access to this route",
-//           next
-//         );
-//       }
+const handleUnauthorizedError = (message: string, next: NextFunction) => {
+  const error = new ApiError(StatusCodes.UNAUTHORIZED, message);
+  next(error);
+};
 
-//       const decoded = jwt.verify(
-//         token as string,
-//         process.env.SECRET_ACCESS_TOKEN as string
-//       ) as JwtPayload;
-//       const { role, id } = decoded.data;
-//       const { iat } = decoded;
-//       const user = await UserModel.findById(id).select("+password");
+export const authMiddleWare = (...requiredRoles: UserRole[]) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const token = req.headers.authorization?.split(" ")[1];
+      
+      if (!token) {
+        return handleUnauthorizedError(
+          "You have no access to this route",
+          next
+        );
+      }
 
-//       if (!user) {
-//         return next(new AppError(httpStatus.NOT_FOUND, "User not found"));
-//       }
-//       if (user?.isDelete) {
-//         return next(
-//           new AppError(httpStatus.BAD_REQUEST, "This User Already Deleted !")
-//         );
-//       }
+      const decoded = jwt.verify(
+        token as string,
+        config.jwt.jwt_secret as string
+      ) as JwtPayload;
+ 
+      const { role, email } = decoded;
+      const user = await prisma.user.findUniqueOrThrow({
+        where: {
+          email,
+        },
+      });
+    
+      if (user?.isDelete) {
+        return next(
+          new ApiError(StatusCodes.BAD_REQUEST, "This User Already Deleted !")
+        );
+      }
 
-//       if (user?.status === USER_STATUS.block) {
-//         return next(
-//           new AppError(httpStatus.BAD_REQUEST, "This User Blocked !")
-//         );
-//       }
-//       const passwordChangeConvertMilliSecond =
-//         new Date(user?.passwordChangeAt as Date).getTime() / 1000;
-//       const jwtIssueTime = iat as number;
-
-//       if (passwordChangeConvertMilliSecond > jwtIssueTime) {
-//         return next(
-//           new AppError(httpStatus.UNAUTHORIZED, "You are not authorized !")
-//         );
-//       }
-//       if (requiredRoles.length > 0 && !requiredRoles.includes(role)) {
-//         return handleUnauthorizedError(
-//           "You have no access to this route",
-//           next
-//         );
-//       }
-//       const data = {
-//         id: user?._id,
-//         role: decoded?.data?.role,
-//       };
-//       req.user = data;
-//       next();
-//     } catch (error) {
-//       return handleUnauthorizedError("You have no access to this route", next);
-//     }
-//   };
-// };
+      if (requiredRoles.length > 0 && !requiredRoles.includes(role)) {
+        return handleUnauthorizedError(
+          "You have no access to this route",
+          next
+        );
+      }
+      const data = {
+        id: user?.id,
+        role:user?.role,
+        email:user?.email
+      };
+   
+      req.user = data;
+      next();
+    } catch (error) {
+      return handleUnauthorizedError("You have no access to this route", next);
+    }
+  };
+};
