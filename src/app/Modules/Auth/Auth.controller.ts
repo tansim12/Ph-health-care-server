@@ -38,8 +38,19 @@ const refreshToken: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+const forgotPassword: RequestHandler = async (req, res, next) => {
+  try {
+    const result = await AuthServices.forgotPasswordDB(req.body);
+    res.send(
+      successResponse(result, StatusCodes.OK, "Email link sending done ")
+    );
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const AuthController = {
   loginUser,
   refreshToken,
+  forgotPassword,
 };
