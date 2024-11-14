@@ -81,7 +81,7 @@ const refreshToken = async (token: string) => {
   };
 };
 
-const changePassword = async (user: any, payload: any) => {
+const changePasswordDB = async (user: any, payload: any) => {
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
       email: user.email,
@@ -152,7 +152,7 @@ const forgotPasswordDB = async (payload: { email: string }) => {
   //console.log(resetPassLink)
 };
 
-const resetPassword = async (
+const resetPasswordDB = async (
   token: string,
   payload: { id: string; password: string }
 ) => {
@@ -192,4 +192,6 @@ export const AuthServices = {
   loginUser,
   refreshToken,
   forgotPasswordDB,
+  changePasswordDB,
+  resetPasswordDB,
 };

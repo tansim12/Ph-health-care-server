@@ -38,6 +38,20 @@ const refreshToken: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+const changePassword: RequestHandler = async (req, res, next) => {
+  try {
+    const result = await AuthServices.changePasswordDB(req.user, req.body);
+    res.send(
+      successResponse(
+        result,
+        StatusCodes.OK,
+        "Password Change Successfully done"
+      )
+    );
+  } catch (error) {
+    next(error);
+  }
+};
 const forgotPassword: RequestHandler = async (req, res, next) => {
   try {
     const result = await AuthServices.forgotPasswordDB(req.body);
@@ -48,9 +62,23 @@ const forgotPassword: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+const resetPassword: RequestHandler = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization || "";
+
+    const result = await AuthServices.resetPasswordDB(token, req?.body);
+    res.send(
+      successResponse(result, StatusCodes.OK, "Password Change Successfully done")
+    );
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const AuthController = {
   loginUser,
   refreshToken,
   forgotPassword,
+  changePassword,
+  resetPassword,
 };
