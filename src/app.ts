@@ -3,6 +3,7 @@ import { userRouter } from "./app/Modules/User/User.route";
 import { adminRouter } from "./app/Modules/Admin/Admin.route";
 import globalErrorHandler from "./app/Error-Handler/globalErrorHandler";
 import normalMiddleware from "./app/middleware/normalMiddleware";
+import { AuthRoutes } from "./app/Modules/Auth/Auth.route";
 
 const app: Application = express();
 normalMiddleware(app);
@@ -13,6 +14,7 @@ app.get("/", (req: Request, res: Response) => {
   });
 });
 
+app.use("/api/auth", AuthRoutes);
 app.use("/api/user", userRouter);
 app.use("/api/admin", adminRouter);
 

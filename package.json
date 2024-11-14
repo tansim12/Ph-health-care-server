@@ -16,6 +16,7 @@
     "express": "^4.21.1",
     "http-status": "^2.0.0",
     "http-status-codes": "^2.3.0",
+    "jsonwebtoken": "^9.0.2",
     "prisma": "^5.22.0",
     "zod": "^3.23.8"
   },
@@ -24,6 +25,7 @@
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/node": "^22.8.6",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
