@@ -48,7 +48,7 @@ const loginUser = async (payload: { email: string; password: string }) => {
 const refreshToken = async (token: string) => {
   let decodedData;
   try {
-    decodedData = jwtHelpers.verifyToken(token, "abcdefghgijklmnop");
+    decodedData = jwtHelpers.verifyToken(token, config.jwt.refresh_token_secret as string);
   } catch (err) {
     throw new Error("You are not authorized!");
   }
@@ -65,7 +65,7 @@ const refreshToken = async (token: string) => {
       email: userData.email,
       role: userData.role,
     },
-    "abcdefg",
+    config.jwt.jwt_secret as string,
     "5m"
   );
 
