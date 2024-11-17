@@ -5,10 +5,7 @@ import { IPaginationOptions } from "../../interface/pagination";
 import { paginationHelper } from "../../helper/paginationHelper";
 import { userSearchAbleFields } from "./User.const";
 
-const getAllUsersDB = async (
-  queryObj: any,
-  options: IPaginationOptions
-) => {
+const getAllUsersDB = async (queryObj: any, options: IPaginationOptions) => {
   const { page, limit, skip } = paginationHelper.calculatePagination(options);
   const { searchTerm, ...filterData } = queryObj;
 
@@ -23,7 +20,7 @@ const getAllUsersDB = async (
       })),
     });
   }
-console.log(searchTerm);
+  console.log(searchTerm);
 
   if (Object.keys(filterData).length > 0) {
     andCondition.push({
@@ -34,11 +31,21 @@ console.log(searchTerm);
       })),
     });
   }
-  
+
   const whereConditions: Prisma.UserWhereInput = { AND: andCondition };
 
   const result = await prisma.user.findMany({
     where: whereConditions,
+    select: {
+      email: true,
+      createdAt: true,
+      id: true,
+      needPasswordChange: true,
+      status: true,
+      isDelete: true,
+      role: true,
+      updatedAt: true,
+    },
     skip,
     take: limit,
     orderBy:

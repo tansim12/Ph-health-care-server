@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.get(
   "/",
-  // authMiddleWare( UserRole.SUPER_ADMIN),
+  authMiddleWare( UserRole.SUPER_ADMIN , UserRole.ADMIN),
   userController.getAllUsers
 );
 router.post("/", userController.createUser);
