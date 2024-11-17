@@ -19,5 +19,11 @@ router.post(
   authMiddleWare(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   userController.adminCreate
 );
+router.post(
+  "/create-doctor",
+  multerUpload.single('image'),
+  authMiddleWare(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  userController.createDoctor
+);
 
 export const userRouter = router;

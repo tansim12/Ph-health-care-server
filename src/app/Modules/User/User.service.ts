@@ -15,11 +15,10 @@ const createUserDB = async (body: any) => {
 const adminCreateDB = async (body: any) => {
   const hashPass = await Bcrypt.hash(body?.password, 12);
   const userData = {
-    password:hashPass,
+    password: hashPass,
     email: body?.admin?.email,
     role: UserRole.ADMIN,
   };
-
 
   const result = await prisma.$transaction(async (tnx) => {
     await tnx.user.create({
@@ -36,8 +35,31 @@ const adminCreateDB = async (body: any) => {
   });
   return result;
 };
+const createDoctorDB = async (body: any) => {
+  const hashPass = await Bcrypt.hash(body?.password, 12);
+  const userData = {
+    password: hashPass,
+    email: body?.doctor?.email,
+    role: UserRole.DOCTOR,
+  };
+
+  const result = await prisma.$transaction(async (tnx) => {
+    await tnx.user.create({
+      data: userData,
+    });
+    
+    const doctorCreate = await tnx.doctor.create({
+      data: body?.doctor,
+    });
+
+    return doctorCreate
+    
+  });
+  return result;
+};
 export const userService = {
   getAllUsersDB,
   createUserDB,
   adminCreateDB,
+  createDoctorDB,
 };
