@@ -19,8 +19,21 @@ const createUser: RequestHandler = async (req, res, next) => {
   }
 };
 const adminCreate: RequestHandler = async (req, res, next) => {
+  console.log(req?.file);
+  console.log();
+  let adminData = JSON.parse(req.body.data).admin;
+  if (req?.file?.path) {
+    adminData = { ...adminData, profilePhoto: req.file.path };
+  }
+
+  const bodyData = {
+    password: JSON.parse(req.body.data).password, // Extract password
+    admin: {
+      ...adminData, // Include the updated admin data
+    },
+  };
   try {
-    const result = await userService.adminCreateDB(req?.body);
+    const result = await userService.adminCreateDB(bodyData);
     res.status(200).send(result);
   } catch (error) {
     next(error);
