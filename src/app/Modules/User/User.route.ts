@@ -36,6 +36,8 @@ router.post(
 router.post(
   "/create-patient",
   multerUpload.single('image'),
+  jsonDataSetMiddleware,
+  validationMiddleWare(userZodValidation.createPatientZodSchema),
   userController.createPatient
 );
 
