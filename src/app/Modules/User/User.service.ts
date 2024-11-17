@@ -1,10 +1,67 @@
-import { PrismaClient, UserRole } from "@prisma/client";
+import { Prisma, PrismaClient, UserRole } from "@prisma/client";
 const prisma = new PrismaClient();
 import Bcrypt from "bcrypt";
+import { IPaginationOptions } from "../../interface/pagination";
+import { paginationHelper } from "../../helper/paginationHelper";
+import { userSearchAbleFields } from "./User.const";
 
-const getAllUsersDB = async () => {
+const getAllUsersDB = async (
+  queryObj: any,
+  options: IPaginationOptions
+) => {
+  const { page, limit, skip } = paginationHelper.calculatePagination(options);
+  const { searchTerm, ...filterData } = queryObj;
+
+  const andCondition = [];
+  if (queryObj.searchTerm) {
+    andCondition.push({
+      OR: userSearchAbleFields.map((field) => ({
+        [field]: {
+          contains: queryObj.searchTerm,
+          mode: "insensitive",
+        },
+      })),
+    });
+  }
+console.log(searchTerm);
+
+  if (Object.keys(filterData).length > 0) {
+    andCondition.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: filterData[key as never],
+        },
+      })),
+    });
+  }
+  
+  const whereConditions: Prisma.UserWhereInput = { AND: andCondition };
+
+  const result = await prisma.user.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? {
+            [options.sortBy]: options.sortOrder,
+          }
+        : {
+            createdAt: "desc",
+          },
+  });
+
+  const total = await prisma.user.count({
+    where: whereConditions,
+  });
+  const meta = {
+    page,
+    limit,
+    total,
+  };
   return {
-    message: "user service",
+    meta,
+    result,
   };
 };
 

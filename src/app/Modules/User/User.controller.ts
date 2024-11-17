@@ -1,10 +1,14 @@
 import { RequestHandler } from "express";
 import { userService } from "./User.service";
 import { successResponse } from "../../Re-useable/successResponse";
+import pick from "../../shared/pick";
+import { userFilterAbleFields } from "./User.const";
 
 const getAllUsers: RequestHandler = async (req, res, next) => {
   try {
-    const result = await userService.getAllUsersDB();
+    const filters = pick(req.query, userFilterAbleFields);
+    const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+    const result = await userService.getAllUsersDB(filters, options);
     res.status(200).send(result);
   } catch (error) {
     next(error);
@@ -33,7 +37,7 @@ const adminCreate: RequestHandler = async (req, res, next) => {
   };
   try {
     const result = await userService.adminCreateDB(bodyData);
-    res.send(successResponse(result,200,"Admin Create Successfully done"));
+    res.send(successResponse(result, 200, "Admin Create Successfully done"));
   } catch (error) {
     next(error);
   }
