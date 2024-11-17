@@ -47,13 +47,33 @@ const createDoctorDB = async (body: any) => {
     await tnx.user.create({
       data: userData,
     });
-    
+
     const doctorCreate = await tnx.doctor.create({
       data: body?.doctor,
     });
 
-    return doctorCreate
-    
+    return doctorCreate;
+  });
+  return result;
+};
+const createPatientDB = async (body: any) => {
+  const hashPass = await Bcrypt.hash(body?.password, 12);
+  const userData = {
+    password: hashPass,
+    email: body?.patient?.email,
+    role: UserRole.PATIENT,
+  };
+
+  const result = await prisma.$transaction(async (tnx) => {
+    await tnx.user.create({
+      data: userData,
+    });
+
+    const patientCreate = await tnx.patient.create({
+      data: body?.patient,
+    });
+
+    return patientCreate;
   });
   return result;
 };
@@ -62,4 +82,5 @@ export const userService = {
   createUserDB,
   adminCreateDB,
   createDoctorDB,
+  createPatientDB,
 };

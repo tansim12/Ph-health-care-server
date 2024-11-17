@@ -20,31 +20,31 @@ const createUser: RequestHandler = async (req, res, next) => {
   }
 };
 const adminCreate: RequestHandler = async (req, res, next) => {
-  let adminData = JSON.parse(req.body.data).admin;
+  let adminData = req.body.admin;
   if (req?.file?.path) {
     adminData = { ...adminData, profilePhoto: req.file.path };
   }
 
   const bodyData = {
-    password: JSON.parse(req.body.data).password, // Extract password
+    password: req.body.password, // Extract password
     admin: {
       ...adminData, // Include the updated admin data
     },
   };
   try {
     const result = await userService.adminCreateDB(bodyData);
-    res.status(200).send(result);
+    res.send(successResponse(result,200,"Admin Create Successfully done"));
   } catch (error) {
     next(error);
   }
 };
 const createDoctor: RequestHandler = async (req, res, next) => {
-  let doctorData = JSON.parse(req.body.data).doctor;
+  let doctorData = req.body.doctor;
   if (req?.file?.path) {
     doctorData = { ...doctorData, profilePhoto: req.file.path };
   }
   const bodyData = {
-    password: JSON.parse(req.body.data).password, // Extract password
+    password: req.body.password, // Extract password
     doctor: {
       ...doctorData, // Include the updated admin data
     },
@@ -56,10 +56,29 @@ const createDoctor: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+const createPatient: RequestHandler = async (req, res, next) => {
+  let patientData = req.body.patient;
+  if (req?.file?.path) {
+    patientData = { ...patientData, profilePhoto: req.file.path };
+  }
+  const bodyData = {
+    password: req.body.password, // Extract password
+    patient: {
+      ...patientData, // Include the updated admin data
+    },
+  };
+  try {
+    const result = await userService.createPatientDB(bodyData);
+    res.send(successResponse(result, 200, "Patient Create Successfully done"));
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const userController = {
   getAllUsers,
   createUser,
   adminCreate,
   createDoctor,
+  createPatient,
 };
