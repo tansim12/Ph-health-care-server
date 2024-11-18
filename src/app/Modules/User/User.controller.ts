@@ -98,6 +98,23 @@ const adminUpdateUser: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+const findByProfile: RequestHandler = async (req, res, next) => {
+  try {
+    const result = await userService.findByProfileDB(
+      req?.user.id,
+      req?.user.role,
+    );
+    res.send(
+      successResponse(
+        result,
+        StatusCodes.OK,
+        "User profile data get successfully done"
+      )
+    );
+  } catch (error) {
+    next(error);
+  }
+};
 export const userController = {
   getAllUsers,
   createUser,
@@ -105,4 +122,5 @@ export const userController = {
   createDoctor,
   createPatient,
   adminUpdateUser,
+  findByProfile,
 };

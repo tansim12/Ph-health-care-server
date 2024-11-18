@@ -46,5 +46,15 @@ router.put(
   validationMiddleWare(userZodValidation.updateUserZodSchema),
   userController.adminUpdateUser
 );
+router.get(
+  "/my-profile",
+  authMiddleWare(
+    UserRole.ADMIN,
+    UserRole.SUPER_ADMIN,
+    UserRole.PATIENT,
+    UserRole.DOCTOR
+  ),
+  userController.findByProfile
+);
 
 export const userRouter = router;
