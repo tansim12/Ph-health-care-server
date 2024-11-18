@@ -79,8 +79,27 @@ const createPatientZodSchema = z.object({
   }),
 });
 
+// Define enums for UserRole and UserStatus
+const UserRole = z.enum(["PATIENT", "ADMIN", "DOCTOR"]); // Replace with actual roles if different
+const UserStatus = z.enum(["ACTIVE", "BLOCKED", "DELETED"]); // Replace with actual statuses if different
+
+// Zod validation schema for the User model
+const updateUserZodSchema = z.object({
+  body: z.object({
+    role: UserRole.default("PATIENT").optional(),
+    status: UserStatus.default("ACTIVE").optional(),
+    isDelete: z.boolean().default(false).optional(),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters long")
+      .optional(), // Adjust validation as needed
+    needPasswordChange: z.boolean().default(true).optional(),
+  }),
+});
+
 export const userZodValidation = {
   createDoctorZodSchema,
   createPatientZodSchema,
   createAdminZodSchema,
+  updateUserZodSchema,
 };

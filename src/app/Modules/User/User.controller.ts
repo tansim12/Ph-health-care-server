@@ -3,6 +3,7 @@ import { userService } from "./User.service";
 import { successResponse } from "../../Re-useable/successResponse";
 import pick from "../../shared/pick";
 import { userFilterAbleFields } from "./User.const";
+import { StatusCodes } from "http-status-codes";
 
 const getAllUsers: RequestHandler = async (req, res, next) => {
   try {
@@ -79,10 +80,29 @@ const createPatient: RequestHandler = async (req, res, next) => {
   }
 };
 
+const adminUpdateUser: RequestHandler = async (req, res, next) => {
+  try {
+    const result = await userService.adminUpdateUserDB(
+      req?.user.id,
+      req?.params?.userId,
+      req.body
+    );
+    res.send(
+      successResponse(
+        result,
+        StatusCodes.OK,
+        "User Info update successfully done"
+      )
+    );
+  } catch (error) {
+    next(error);
+  }
+};
 export const userController = {
   getAllUsers,
   createUser,
   adminCreate,
   createDoctor,
   createPatient,
+  adminUpdateUser,
 };

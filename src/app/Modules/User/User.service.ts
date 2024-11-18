@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient, UserRole } from "@prisma/client";
+import { Prisma, PrismaClient, UserRole, UserStatus } from "@prisma/client";
 const prisma = new PrismaClient();
 import Bcrypt from "bcrypt";
 import { IPaginationOptions } from "../../interface/pagination";
@@ -141,10 +141,37 @@ const createPatientDB = async (body: any) => {
   });
   return result;
 };
+
+const adminUpdateUserDB = async (
+  tokenId: string,
+  userId: string,
+  payload: any
+) => {
+  await prisma.user.findUniqueOrThrow({
+    where: {
+      id: tokenId,
+      isDelete: false,
+      status: UserStatus.ACTIVE,
+    },
+  });
+
+  const result = await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: payload,
+    select: {
+      id: true,
+    },
+  });
+
+  return result;
+};
 export const userService = {
   getAllUsersDB,
   createUserDB,
   adminCreateDB,
   createDoctorDB,
   createPatientDB,
+  adminUpdateUserDB,
 };

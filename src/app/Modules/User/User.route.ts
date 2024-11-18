@@ -13,13 +13,13 @@ const router = express.Router();
 
 router.get(
   "/",
-  authMiddleWare( UserRole.SUPER_ADMIN , UserRole.ADMIN),
+  authMiddleWare(UserRole.SUPER_ADMIN, UserRole.ADMIN),
   userController.getAllUsers
 );
 router.post("/", userController.createUser);
 router.post(
   "/create-admin",
-  multerUpload.single('image'),
+  multerUpload.single("image"),
   jsonDataSetMiddleware,
   authMiddleWare(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   validationMiddleWare(userZodValidation.createAdminZodSchema),
@@ -27,7 +27,7 @@ router.post(
 );
 router.post(
   "/create-doctor",
-  multerUpload.single('image'),
+  multerUpload.single("image"),
   jsonDataSetMiddleware,
   authMiddleWare(UserRole.ADMIN, UserRole.SUPER_ADMIN),
   validationMiddleWare(userZodValidation.createDoctorZodSchema),
@@ -35,10 +35,16 @@ router.post(
 );
 router.post(
   "/create-patient",
-  multerUpload.single('image'),
+  multerUpload.single("image"),
   jsonDataSetMiddleware,
   validationMiddleWare(userZodValidation.createPatientZodSchema),
   userController.createPatient
+);
+router.put(
+  "/update-info/:userId",
+  authMiddleWare(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  validationMiddleWare(userZodValidation.updateUserZodSchema),
+  userController.adminUpdateUser
 );
 
 export const userRouter = router;
