@@ -102,7 +102,29 @@ const findMyProfile: RequestHandler = async (req, res, next) => {
   try {
     const result = await userService.findMyProfileDB(
       req?.user.id,
+      req?.user.role
+    );
+    res.send(
+      successResponse(
+        result,
+        StatusCodes.OK,
+        "User profile data get successfully done"
+      )
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+const updateMyProfile: RequestHandler = async (req, res, next) => {
+  let userData = req.body;
+  if (req?.file?.path) {
+    userData = { ...userData, profilePhoto: req.file.path };
+  }
+  try {
+    const result = await userService.updateMyProfileDB(
+      req?.user.id,
       req?.user.role,
+      userData
     );
     res.send(
       successResponse(
@@ -123,4 +145,5 @@ export const userController = {
   createPatient,
   adminUpdateUser,
   findMyProfile,
+  updateMyProfile,
 };

@@ -4,6 +4,8 @@ import Bcrypt from "bcrypt";
 import { IPaginationOptions } from "../../interface/pagination";
 import { paginationHelper } from "../../helper/paginationHelper";
 import { userSearchAbleFields } from "./User.const";
+import ApiError from "../../Error-Handler/ApiError";
+import { StatusCodes } from "http-status-codes";
 
 const getAllUsersDB = async (queryObj: any, options: IPaginationOptions) => {
   const { page, limit, skip } = paginationHelper.calculatePagination(options);
@@ -202,43 +204,43 @@ const findMyProfileDB = async (tokenId: string, role: string) => {
     });
   }
 
-  return {...userProfile, ...user,  };
+  return { ...userProfile, ...user };
 };
-const findByProfileDB = async (tokenId: string, role: string) => {
+const updateMyProfileDB = async (tokenId: string, role: string, body: any) => {
   const user = await prisma.user.findUniqueOrThrow({
     where: { id: tokenId, isDelete: false, status: UserStatus.ACTIVE },
-    select: {
-      id: true,
-      email: true,
-      needPasswordChange: true,
-      status: true,
-      isDelete: true,
-      role: true,
-      createdAt: true,
-      updatedAt: true,
-    },
   });
+
+  if (body.status || body.role) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      "You can't change role and status"
+    );
+  }
 
   let userProfile = {};
 
   if (role === UserRole.ADMIN || role === UserRole.SUPER_ADMIN) {
-    userProfile = await prisma.admin.findUniqueOrThrow({
+    userProfile = await prisma.admin.update({
       where: { email: user.email },
+      data: body,
     });
   }
 
   if (role === UserRole.PATIENT) {
-    userProfile = await prisma.patient.findUniqueOrThrow({
+    userProfile = await prisma.patient.update({
       where: { email: user.email },
+      data: body,
     });
   }
   if (role === UserRole.DOCTOR) {
-    userProfile = await prisma.doctor.findUniqueOrThrow({
+    userProfile = await prisma.doctor.update({
       where: { email: user.email },
+      data: body,
     });
   }
 
-  return {...userProfile, ...user,  };
+  return userProfile;
 };
 export const userService = {
   getAllUsersDB,
@@ -248,4 +250,5 @@ export const userService = {
   createPatientDB,
   adminUpdateUserDB,
   findMyProfileDB,
+  updateMyProfileDB,
 };

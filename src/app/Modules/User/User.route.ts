@@ -56,5 +56,17 @@ router.get(
   ),
   userController.findMyProfile
 );
+router.put(
+  "/update-my-profile",
+  multerUpload.single("image"),
+  jsonDataSetMiddleware,
+  authMiddleWare(
+    UserRole.ADMIN,
+    UserRole.SUPER_ADMIN,
+    UserRole.PATIENT,
+    UserRole.DOCTOR
+  ),
+  userController.updateMyProfile
+);
 
 export const userRouter = router;
