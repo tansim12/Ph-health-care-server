@@ -16,5 +16,10 @@ router.post(
   validationMiddleWare(specialtiesZodSchemas.createSpecialtiesZodSchema),
   specialtiesController.createSpecialties
 );
+router.get(
+  "/",
+  authMiddleWare(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.DOCTOR),
+  specialtiesController.findAllSpecialties
+);
 
 export const specialtiesRouter = router;

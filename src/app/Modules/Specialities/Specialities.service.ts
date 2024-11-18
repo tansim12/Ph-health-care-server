@@ -15,7 +15,20 @@ const createSpecialtiesDB = async (tokenId: string, payload: any) => {
   });
   return result;
 };
+const findAllSpecialtiesDB = async (tokenId: string,) => {
+  await prisma.user.findUniqueOrThrow({
+    where: {
+      id: tokenId,
+      status: UserStatus.ACTIVE,
+      isDelete: false,
+    },
+  });
+
+  const result = await prisma.specialties.findMany();
+  return result;
+};
 
 export const specialtiesService = {
   createSpecialtiesDB,
+  findAllSpecialtiesDB,
 };

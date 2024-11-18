@@ -24,7 +24,22 @@ const createSpecialties: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+const findAllSpecialties: RequestHandler = async (req, res, next) => {
+  const result = await specialtiesService.findAllSpecialtiesDB(req?.user.id);
+  res.send(
+    successResponse(
+      result,
+      StatusCodes.OK,
+      "Specialties all date get successfully done here"
+    )
+  );
+  try {
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const specialtiesController = {
   createSpecialties,
+  findAllSpecialties,
 };
