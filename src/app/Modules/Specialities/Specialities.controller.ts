@@ -38,8 +38,26 @@ const findAllSpecialties: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+const deleteSpecialties: RequestHandler = async (req, res, next) => {
+  const result = await specialtiesService.deleteSpecialtiesDB(
+    req?.user.id,
+    req?.params?.specialtiesId
+  );
+  res.send(
+    successResponse(
+      result,
+      StatusCodes.OK,
+      "Specialties date delete successfully done here"
+    )
+  );
+  try {
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const specialtiesController = {
   createSpecialties,
   findAllSpecialties,
+  deleteSpecialties,
 };

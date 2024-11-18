@@ -15,7 +15,7 @@ const createSpecialtiesDB = async (tokenId: string, payload: any) => {
   });
   return result;
 };
-const findAllSpecialtiesDB = async (tokenId: string,) => {
+const findAllSpecialtiesDB = async (tokenId: string) => {
   await prisma.user.findUniqueOrThrow({
     where: {
       id: tokenId,
@@ -27,8 +27,25 @@ const findAllSpecialtiesDB = async (tokenId: string,) => {
   const result = await prisma.specialties.findMany();
   return result;
 };
+const deleteSpecialtiesDB = async (tokenId: string, specialtiesId: string) => {
+  await prisma.user.findUniqueOrThrow({
+    where: {
+      id: tokenId,
+      status: UserStatus.ACTIVE,
+      isDelete: false,
+    },
+  });
+
+  const result = await prisma.specialties.delete({
+    where: {
+      id: specialtiesId,
+    },
+  });
+  return result;
+};
 
 export const specialtiesService = {
   createSpecialtiesDB,
   findAllSpecialtiesDB,
+  deleteSpecialtiesDB,
 };

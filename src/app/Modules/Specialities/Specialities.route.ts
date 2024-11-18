@@ -21,5 +21,10 @@ router.get(
   authMiddleWare(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.DOCTOR),
   specialtiesController.findAllSpecialties
 );
+router.delete(
+  "/:specialtiesId",
+  authMiddleWare(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.DOCTOR),
+  specialtiesController.deleteSpecialties
+);
 
 export const specialtiesRouter = router;
