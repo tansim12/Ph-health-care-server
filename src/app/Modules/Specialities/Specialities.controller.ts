@@ -4,9 +4,13 @@ import { successResponse } from "../../Re-useable/successResponse";
 import { StatusCodes } from "http-status-codes";
 
 const createSpecialties: RequestHandler = async (req, res, next) => {
+  let body = req.body;
+  if (req?.file?.path) {
+    body = { ...body, icon: req.file.path };
+  }
   const result = await specialtiesService.createSpecialtiesDB(
     req?.user.id,
-    req?.body
+    body
   );
   res.send(
     successResponse(
