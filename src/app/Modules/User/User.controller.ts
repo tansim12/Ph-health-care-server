@@ -98,9 +98,9 @@ const adminUpdateUser: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
-const findByProfile: RequestHandler = async (req, res, next) => {
+const findMyProfile: RequestHandler = async (req, res, next) => {
   try {
-    const result = await userService.findByProfileDB(
+    const result = await userService.findMyProfileDB(
       req?.user.id,
       req?.user.role,
     );
@@ -122,5 +122,5 @@ export const userController = {
   createDoctor,
   createPatient,
   adminUpdateUser,
-  findByProfile,
+  findMyProfile,
 };

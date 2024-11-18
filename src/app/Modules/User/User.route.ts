@@ -54,7 +54,7 @@ router.get(
     UserRole.PATIENT,
     UserRole.DOCTOR
   ),
-  userController.findByProfile
+  userController.findMyProfile
 );
 
 export const userRouter = router;
