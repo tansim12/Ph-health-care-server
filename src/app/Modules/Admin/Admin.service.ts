@@ -68,15 +68,14 @@ const findAllAdminDB = async (
 };
 
 const getSingleAdminDB = async (id: string) => {
-  const result = await prisma.admin.findUnique({
+  const result = await prisma.admin.findUniqueOrThrow({
     where: {
       id,
       isDeleted: false,
     },
   });
-  return {
-    result,
-  };
+  return result
+  
 };
 const updateAdminInfoDB = async (id: string, body: Partial<Admin>) => {
   await prisma.admin.findUniqueOrThrow({
