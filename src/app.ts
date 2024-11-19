@@ -5,6 +5,7 @@ import globalErrorHandler from "./app/Error-Handler/globalErrorHandler";
 import normalMiddleware from "./app/middleware/normalMiddleware";
 import { AuthRoutes } from "./app/Modules/Auth/Auth.route";
 import { specialtiesRouter } from "./app/Modules/Specialities/Specialities.route";
+import { doctorRouter } from "./app/Modules/Doctor/Doctor.route";
 
 const app: Application = express();
 normalMiddleware(app);
@@ -19,6 +20,7 @@ app.use("/api/auth", AuthRoutes);
 app.use("/api/user", userRouter);
 app.use("/api/admin", adminRouter);
 app.use("/api/specialties", specialtiesRouter);
+app.use("/api/doctor", doctorRouter);
 
 app.all("*", (req: Request, res: Response, next) => {
   const error = new Error(`Can't find ${req.url} on the server`);
