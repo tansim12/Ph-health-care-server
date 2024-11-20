@@ -65,7 +65,7 @@ const doctorInfoUpdateSpecialtiesCreateAndUpdateDB = async (
 
 const findAllDoctorDB = async (queryObj: any, options: IPaginationOptions) => {
   const { page, limit, skip } = paginationHelper.calculatePagination(options);
-  const { searchTerm, ...filterData } = queryObj;
+  const { searchTerm, dSpecialties, ...filterData } = queryObj;
 
   const andCondition = [];
   if (queryObj.searchTerm) {
@@ -79,6 +79,21 @@ const findAllDoctorDB = async (queryObj: any, options: IPaginationOptions) => {
     });
   }
 
+  if (dSpecialties && dSpecialties.length > 0) {
+    andCondition.push({
+      doctorSpecialties: {
+        some: {
+          specialties: {
+            title: {
+              contains: dSpecialties,
+              mode: "insensitive",
+            },
+          },
+        },
+      },
+    });
+  }
+
   if (Object.keys(filterData).length > 0) {
     andCondition.push({
       AND: Object.keys(filterData).map((key) => ({
@@ -89,7 +104,7 @@ const findAllDoctorDB = async (queryObj: any, options: IPaginationOptions) => {
     });
   }
 
-  const whereConditions: Prisma.AdminWhereInput = { AND: andCondition };
+  const whereConditions: Prisma.AdminWhereInput = { AND: andCondition as any };
 
   const result = await prisma.doctor.findMany({
     where: whereConditions as never,
