@@ -150,8 +150,47 @@ const updatePatientInfoCreatePatientHealthDataAndReportsDB = async (
   id: string,
   payload: any
 ) => {
-  console.log(id);
-  
+  const { reports, healthData, ...patientInfo } = payload;
+
+  await prisma.$transaction(async (tx) => {
+    // patientHealthData update here
+    if (healthData) {
+      await tx.patientHealthData.upsert({
+        where: {
+          patientId: id,
+        },
+        update: healthData,
+        create: { ...healthData, patientId: id },
+      });
+    }
+
+    // patient medical reports create here
+    if (reports) {
+      await tx.medicalReport.create({
+        data: { ...reports, patientId: id },
+      });
+    }
+    // patient info update here
+    if (patientInfo) {
+      await tx.patient.update({
+        where: {
+          id,
+        },
+        data: patientInfo,
+      });
+    }
+  });
+  const result = await prisma.patient.findUniqueOrThrow({
+    where: {
+      id,
+    },
+    include: {
+      medicalReport: true,
+      patientHealthData: true,
+    },
+  });
+
+  return result;
 };
 
 export const patientService = {
