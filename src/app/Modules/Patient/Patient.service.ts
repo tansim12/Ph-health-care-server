@@ -151,7 +151,12 @@ const updatePatientInfoCreatePatientHealthDataAndReportsDB = async (
   payload: any
 ) => {
   const { reports, healthData, ...patientInfo } = payload;
-
+  await prisma.patient.findUniqueOrThrow({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
   await prisma.$transaction(async (tx) => {
     // patientHealthData update here
     if (healthData) {
