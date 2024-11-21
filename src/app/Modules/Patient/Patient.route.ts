@@ -7,10 +7,10 @@ router.get("/", patientController.findAllPatient);
 
 router.get("/:id", patientController.getSinglePatient);
 
-// router.patch(
-//     '/:id',
-//     PatientController.updateIntoDB
-// );
+router.put(
+  "/:id",
+  patientController.updatePatientInfoCreatePatientHealthDataAndReports
+);
 
 router.delete("/:id", patientController.permanentDeletePatient);
 router.delete("/soft/:id", patientController.sortDeletePatient);

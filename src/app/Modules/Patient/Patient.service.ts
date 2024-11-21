@@ -146,9 +146,18 @@ const sortDeletePatientDB = async (id: string) => {
   });
 };
 
+const updatePatientInfoCreatePatientHealthDataAndReportsDB = async (
+  id: string,
+  payload: any
+) => {
+  console.log(id);
+  
+};
+
 export const patientService = {
   findAllPatientDB,
   getSinglePatientDB,
   permanentDeletePatientDB,
   sortDeletePatientDB,
+  updatePatientInfoCreatePatientHealthDataAndReportsDB,
 };

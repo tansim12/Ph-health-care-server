@@ -56,10 +56,30 @@ const sortDeletePatient: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+const updatePatientInfoCreatePatientHealthDataAndReports: RequestHandler =
+  async (req, res, next) => {
+    try {
+      const result =
+        await patientService.updatePatientInfoCreatePatientHealthDataAndReportsDB(
+          req?.params.id,
+          req?.body
+        );
+      res.send(
+        successResponse(
+          result,
+          200,
+          "Single patient data update Successfully Done"
+        )
+      );
+    } catch (error) {
+      next(error);
+    }
+  };
 
 export const patientController = {
   findAllPatient,
   getSinglePatient,
   permanentDeletePatient,
   sortDeletePatient,
+  updatePatientInfoCreatePatientHealthDataAndReports,
 };
