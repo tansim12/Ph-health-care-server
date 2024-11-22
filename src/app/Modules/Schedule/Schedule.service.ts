@@ -156,7 +156,10 @@ const findAllScheduleDB = async (
   });
 
   const total = await prisma.schedule.count({
-    where: whereConditions as never,
+    where: {
+      ...(whereConditions as any),
+      id: { notIn: doctorAlreadyUseScheduleId }, // filter doctor schedule remove
+    },
   });
   const meta = {
     page,
