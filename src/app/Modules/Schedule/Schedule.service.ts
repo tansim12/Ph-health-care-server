@@ -71,11 +71,34 @@ const scheduleCreateDB = async (payload: any) => {
   return scheduleReturnData;
 };
 
-const findAllScheduleDB = async (queryObj:any, options:IPaginationOptions) => {
+const findAllScheduleDB = async (
+  queryObj: any,
+  options: IPaginationOptions,
+  tokenDoctorEmail: string
+) => {
   const { page, limit, skip } = paginationHelper.calculatePagination(options);
-  const { searchTerm, dSpecialties, ...filterData } = queryObj;
+  const { searchTerm, startDate, endDate, ...filterData } = queryObj;
 
   const andCondition = [];
+
+  // implement date range filter
+  if (startDate && endDate) {
+    andCondition.push({
+      AND: [
+        {
+          startDateTime: {
+            gte: startDate,
+          },
+        },
+        {
+          endDateTime: {
+            lte: endDate,
+          },
+        },
+      ],
+    });
+  }
+
   if (queryObj.searchTerm) {
     andCondition.push({
       OR: scheduleSearchAbleFields.map((field) => ({
@@ -86,8 +109,6 @@ const findAllScheduleDB = async (queryObj:any, options:IPaginationOptions) => {
       })),
     });
   }
-
-  
 
   if (Object.keys(filterData).length > 0) {
     andCondition.push({
@@ -101,9 +122,27 @@ const findAllScheduleDB = async (queryObj:any, options:IPaginationOptions) => {
 
   const whereConditions: Prisma.AdminWhereInput = { AND: andCondition as any };
 
+  console.log(tokenDoctorEmail);
+
+  // find doctor schedule
+  const doctorScheduleData = await prisma.doctorSchedules.findMany({
+    where: {
+      doctor: {
+        email: tokenDoctorEmail,
+      },
+    },
+  });
+
+  const doctorAlreadyUseScheduleId = doctorScheduleData.map(
+    (item: any) => item?.scheduleId
+  );
+
   const result = await prisma.schedule.findMany({
-    where: whereConditions as never,
-   
+    where: {
+      ...(whereConditions as any),
+      id: { notIn: doctorAlreadyUseScheduleId }, // filter doctor schedule remove
+    },
+
     skip,
     take: limit,
     orderBy:
@@ -128,7 +167,6 @@ const findAllScheduleDB = async (queryObj:any, options:IPaginationOptions) => {
     meta,
     result,
   };
-  
 };
 
 export const scheduleService = {

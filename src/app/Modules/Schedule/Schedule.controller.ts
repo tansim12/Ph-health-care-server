@@ -17,7 +17,7 @@ const findAllSchedule: RequestHandler = async (req, res, next) => {
   try {
     const filters = pick(req.query, scheduleFilterableFields);
     const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
-    const result = await scheduleService.findAllScheduleDB(filters, options);
+    const result = await scheduleService.findAllScheduleDB(filters, options,req?.user?.email);
     res.send(
       successResponse(result, 200, "Find all schedule  Successfully Done")
     );
