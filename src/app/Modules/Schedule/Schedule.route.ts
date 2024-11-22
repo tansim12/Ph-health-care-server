@@ -9,5 +9,10 @@ router.post(
   authMiddleWare(UserRole.SUPER_ADMIN, UserRole.ADMIN),
   scheduleController.scheduleCreate
 );
+router.get(
+  "/",
+  authMiddleWare(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR),
+  scheduleController.findAllSchedule
+);
 
 export const scheduleRouter = router;

@@ -1,5 +1,9 @@
 import { addHours, addMinutes, format } from "date-fns";
 import prisma from "../../shared/prisma";
+import { IPaginationOptions } from "../../interface/pagination";
+import { paginationHelper } from "../../helper/paginationHelper";
+import { scheduleSearchAbleFields } from "./Schedule.const";
+import { Prisma } from "@prisma/client";
 const convertDateTime = async (date: Date) => {
   const offset = date.getTimezoneOffset() * 60000;
   return new Date(date.getTime() + offset);
@@ -9,7 +13,7 @@ const scheduleCreateDB = async (payload: any) => {
   const { startDate, endDate, startTime, endTime, timeInterval } = payload;
   const currentStartDate = new Date(startDate);
   const currentEndDate = new Date(endDate);
-  const scheduleReturnData = [];
+  const scheduleReturnData = [] as any;
   while (currentStartDate <= currentEndDate) {
     const startDateTime = new Date(
       addMinutes(
@@ -42,7 +46,6 @@ const scheduleCreateDB = async (payload: any) => {
       const s = await convertDateTime(startDateTime);
       const e = await convertDateTime(addMinutes(startDateTime, timeInterval));
 
-      
       const scheduleData = {
         startDateTime: s,
         endDateTime: e,
@@ -68,6 +71,67 @@ const scheduleCreateDB = async (payload: any) => {
   return scheduleReturnData;
 };
 
+const findAllScheduleDB = async (queryObj:any, options:IPaginationOptions) => {
+  const { page, limit, skip } = paginationHelper.calculatePagination(options);
+  const { searchTerm, dSpecialties, ...filterData } = queryObj;
+
+  const andCondition = [];
+  if (queryObj.searchTerm) {
+    andCondition.push({
+      OR: scheduleSearchAbleFields.map((field) => ({
+        [field]: {
+          contains: queryObj.searchTerm,
+          mode: "insensitive",
+        },
+      })),
+    });
+  }
+
+  
+
+  if (Object.keys(filterData).length > 0) {
+    andCondition.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: filterData[key as never],
+        },
+      })),
+    });
+  }
+
+  const whereConditions: Prisma.AdminWhereInput = { AND: andCondition as any };
+
+  const result = await prisma.schedule.findMany({
+    where: whereConditions as never,
+   
+    skip,
+    take: limit,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? {
+            [options.sortBy]: options.sortOrder,
+          }
+        : {
+            createdAt: "desc",
+          },
+  });
+
+  const total = await prisma.schedule.count({
+    where: whereConditions as never,
+  });
+  const meta = {
+    page,
+    limit,
+    total,
+  };
+  return {
+    meta,
+    result,
+  };
+  
+};
+
 export const scheduleService = {
   scheduleCreateDB,
+  findAllScheduleDB,
 };
