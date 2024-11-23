@@ -33,7 +33,7 @@ const findSingleDoctorScheduleDB = async (
 
   const andCondition = [];
 
-  // implement date range filter
+  // implement date range filter inside schedule
   if (startDate && endDate) {
     andCondition.push({
       AND: [
@@ -68,12 +68,19 @@ const findSingleDoctorScheduleDB = async (
   if (Object.keys(filterData).length > 0) {
     if (filterData) {
     }
-   if (typeof filterData?.isBooked === "string" && filterData?.isBooked === "false") {
-    filterData.isBooked = false
-   }
-   if (typeof filterData?.isBooked === "string" && filterData?.isBooked === "true") {
-    filterData.isBooked = true
-   }
+    // check isBooked boolean and set value
+    if (
+      typeof filterData?.isBooked === "string" &&
+      filterData?.isBooked === "false"
+    ) {
+      filterData.isBooked = false;
+    }
+    if (
+      typeof filterData?.isBooked === "string" &&
+      filterData?.isBooked === "true"
+    ) {
+      filterData.isBooked = true;
+    }
     andCondition.push({
       AND: Object.keys(filterData).map((key) => ({
         [key]: {
