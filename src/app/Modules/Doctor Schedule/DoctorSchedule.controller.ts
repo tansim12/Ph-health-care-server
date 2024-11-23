@@ -2,6 +2,9 @@ import { RequestHandler } from "express";
 
 import { successResponse } from "../../Re-useable/successResponse";
 import { doctorScheduleService } from "./DoctorSchedule.service";
+import pick from "../../shared/pick";
+import { doctorScheduleFilterableFields } from "./DoctorSchedule.const";
+
 
 const doctorScheduleCreate: RequestHandler = async (req, res, next) => {
   try {
@@ -17,6 +20,24 @@ const doctorScheduleCreate: RequestHandler = async (req, res, next) => {
   }
 };
 
+const findSingleDoctorSchedule: RequestHandler = async (req, res, next) => {
+  try {  
+    const filters = pick(req.query, doctorScheduleFilterableFields);
+    const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+    const result = await doctorScheduleService.findSingleDoctorScheduleDB(
+      filters,
+      options,
+      req?.user?.email
+    );
+    res.send(
+      successResponse(result, 200, "Find doctor schedule  Successfully Done")
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const doctorScheduleController = {
   doctorScheduleCreate,
+  findSingleDoctorSchedule,
 };

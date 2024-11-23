@@ -10,5 +10,10 @@ router.post(
   authMiddleWare(UserRole.DOCTOR),
   doctorScheduleController.doctorScheduleCreate
 );
+router.get(
+  "/my-schedule",
+  authMiddleWare(UserRole.DOCTOR),
+  doctorScheduleController.findSingleDoctorSchedule
+);
 
 export const doctorScheduleRouter = router;
