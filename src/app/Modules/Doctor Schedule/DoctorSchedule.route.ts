@@ -15,5 +15,10 @@ router.get(
   authMiddleWare(UserRole.DOCTOR),
   doctorScheduleController.findSingleDoctorSchedule
 );
+router.delete(
+  "/:scheduleId",
+  authMiddleWare(UserRole.DOCTOR),
+  doctorScheduleController.deleteSingleDoctorSchedule
+);
 
 export const doctorScheduleRouter = router;

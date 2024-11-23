@@ -5,7 +5,6 @@ import { doctorScheduleService } from "./DoctorSchedule.service";
 import pick from "../../shared/pick";
 import { doctorScheduleFilterableFields } from "./DoctorSchedule.const";
 
-
 const doctorScheduleCreate: RequestHandler = async (req, res, next) => {
   try {
     const result = await doctorScheduleService.doctorCreateScheduleDB(
@@ -21,7 +20,7 @@ const doctorScheduleCreate: RequestHandler = async (req, res, next) => {
 };
 
 const findSingleDoctorSchedule: RequestHandler = async (req, res, next) => {
-  try {  
+  try {
     const filters = pick(req.query, doctorScheduleFilterableFields);
     const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
     const result = await doctorScheduleService.findSingleDoctorScheduleDB(
@@ -36,8 +35,22 @@ const findSingleDoctorSchedule: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+const deleteSingleDoctorSchedule: RequestHandler = async (req, res, next) => {
+  try {
+    const result = await doctorScheduleService.deleteSingleDoctorScheduleDB(
+      req?.user?.email,
+      req?.params.scheduleId
+    );
+    res.send(
+      successResponse(result, 200, "Delete doctor schedule  Successfully Done")
+    );
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const doctorScheduleController = {
   doctorScheduleCreate,
   findSingleDoctorSchedule,
+  deleteSingleDoctorSchedule,
 };

@@ -2,6 +2,8 @@ import { Prisma } from "@prisma/client";
 import prisma from "../../shared/prisma";
 import { paginationHelper } from "../../helper/paginationHelper";
 import { IPaginationOptions } from "../../interface/pagination";
+import ApiError from "../../Error-Handler/ApiError";
+import { StatusCodes } from "http-status-codes";
 
 const doctorCreateScheduleDB = async (email: string, payload: any) => {
   const doctorInfo = await prisma.doctor.findUniqueOrThrow({
@@ -131,7 +133,45 @@ const findSingleDoctorScheduleDB = async (
   };
 };
 
+const deleteSingleDoctorScheduleDB = async (
+  tokenEmail: string,
+  scheduleId: string
+) => {
+  const doctorInfo = await prisma.doctor.findUniqueOrThrow({
+    where: {
+      email: tokenEmail,
+      isDeleted: false,
+    },
+  });
+
+  const isBookedSchedule = await prisma.doctorSchedules.findFirst({
+    where: {
+      doctorId: doctorInfo.id,
+      scheduleId,
+      isBooked: true,
+    },
+  });
+  if (isBookedSchedule) {
+    throw new ApiError(
+      StatusCodes.BAD_REQUEST,
+      "This Schedule already booked..."
+    );
+  }
+
+  const result = await prisma.doctorSchedules.delete({
+    where: {
+      doctorId_scheduleId: {
+        doctorId: doctorInfo.id,
+        scheduleId,
+      },
+    },
+  });
+
+  return result;
+};
+
 export const doctorScheduleService = {
   doctorCreateScheduleDB,
   findSingleDoctorScheduleDB,
+  deleteSingleDoctorScheduleDB,
 };
