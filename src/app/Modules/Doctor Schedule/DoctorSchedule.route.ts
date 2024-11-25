@@ -12,7 +12,7 @@ router.post(
 );
 router.get(
   "/",
-  authMiddleWare(UserRole.DOCTOR, UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  authMiddleWare(UserRole.DOCTOR, UserRole.ADMIN, UserRole.SUPER_ADMIN,UserRole.PATIENT),
   doctorScheduleController.findAllDoctorSchedule
 );
 router.get(
