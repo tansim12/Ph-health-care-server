@@ -11,6 +11,11 @@ router.post(
   doctorScheduleController.doctorScheduleCreate
 );
 router.get(
+  "/",
+  authMiddleWare(UserRole.DOCTOR, UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  doctorScheduleController.findAllDoctorSchedule
+);
+router.get(
   "/my-schedule",
   authMiddleWare(UserRole.DOCTOR),
   doctorScheduleController.findSingleDoctorSchedule

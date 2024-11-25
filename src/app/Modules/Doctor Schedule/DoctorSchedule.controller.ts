@@ -19,6 +19,21 @@ const doctorScheduleCreate: RequestHandler = async (req, res, next) => {
   }
 };
 
+const findAllDoctorSchedule: RequestHandler = async (req, res, next) => {
+  try {
+    const filters = pick(req.query, doctorScheduleFilterableFields);
+    const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+    const result = await doctorScheduleService.findAllDoctorScheduleDB(
+      filters,
+      options
+    );
+    res.send(
+      successResponse(result, 200, "Find doctor schedule  Successfully Done")
+    );
+  } catch (error) {
+    next(error);
+  }
+};
 const findSingleDoctorSchedule: RequestHandler = async (req, res, next) => {
   try {
     const filters = pick(req.query, doctorScheduleFilterableFields);
@@ -53,4 +68,5 @@ export const doctorScheduleController = {
   doctorScheduleCreate,
   findSingleDoctorSchedule,
   deleteSingleDoctorSchedule,
+  findAllDoctorSchedule,
 };
