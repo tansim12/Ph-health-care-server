@@ -81,18 +81,34 @@ const findAllAppointmentDB = async (
   tokenEmail: string
 ) => {
   const { page, limit, skip } = paginationHelper.calculatePagination(options);
-  const { searchTerm, ...filterData } = queryObj;
+  const { searchTerm, startDate, endDate, ...filterData } = queryObj;
 
   const andCondition = [];
+
+  // filter by schedule startDate and endDate
+  if (startDate && endDate) {
+    andCondition.push({
+      AND: [
+        {
+          schedule: {
+            startDateTime: {
+              gte: startDate,
+            },
+          },
+        },
+        {
+          schedule: {
+            endDateTime: {
+              lte: endDate,
+            },
+          },
+        },
+      ],
+    });
+  }
   if (queryObj.searchTerm) {
     andCondition.push({
       doctor: {
-        name: {
-          contains: queryObj.searchTerm,
-          mode: "insensitive",
-        },
-      },
-      patient: {
         name: {
           contains: queryObj.searchTerm,
           mode: "insensitive",
