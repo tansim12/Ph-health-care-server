@@ -11,6 +11,11 @@ router.post(
   appointmentController.createAppointment
 );
 router.get(
+  "/",
+  authMiddleWare(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  appointmentController.findAllAppointment
+);
+router.get(
   "/patient/my-appointments",
   authMiddleWare(UserRole.PATIENT),
   appointmentController.findPatientMyAppointment

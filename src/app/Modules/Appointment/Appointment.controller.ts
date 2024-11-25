@@ -17,6 +17,26 @@ const createAppointment: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+const findAllAppointment: RequestHandler = async (req, res, next) => {
+  try {
+    const filters = pick(req.query, appointmentFilterableFields);
+    const options = pick(req.query, ["limit", "page", "sortBy", "sortOrder"]);
+    const result = await appointmentService.findAllAppointmentDB(
+      filters,
+      options,
+      req?.user?.email
+    );
+    res.send(
+      successResponse(
+        result,
+        200,
+        "Find All Appointment data Successfully Done"
+      )
+    );
+  } catch (error) {
+    next(error);
+  }
+};
 const findPatientMyAppointment: RequestHandler = async (req, res, next) => {
   try {
     const filters = pick(req.query, appointmentFilterableFields);
@@ -54,4 +74,5 @@ export const appointmentController = {
   createAppointment,
   findPatientMyAppointment,
   findDoctorMyAppointment,
+  findAllAppointment,
 };

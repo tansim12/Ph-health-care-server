@@ -75,6 +75,88 @@ const createAppointmentDB = async (tokenEmail: string, payload: any) => {
   return result;
 };
 
+const findAllAppointmentDB = async (
+  queryObj: any,
+  options: any,
+  tokenEmail: string
+) => {
+  const { page, limit, skip } = paginationHelper.calculatePagination(options);
+  const { searchTerm, ...filterData } = queryObj;
+
+  const andCondition = [];
+  if (queryObj.searchTerm) {
+    andCondition.push({
+      doctor: {
+        name: {
+          contains: queryObj.searchTerm,
+          mode: "insensitive",
+        },
+      },
+      patient: {
+        name: {
+          contains: queryObj.searchTerm,
+          mode: "insensitive",
+        },
+      },
+    });
+  }
+
+  if (Object.keys(filterData).length > 0) {
+    andCondition.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: filterData[key as never],
+        },
+      })),
+    });
+  }
+
+  const whereConditions: Prisma.AdminWhereInput = { AND: andCondition as any };
+
+  const result = await prisma.appointment.findMany({
+    where: {
+      ...(whereConditions as any),
+    },
+    include: {
+      doctor: true,
+      doctorSchedule: true,
+      patient: {
+        include: {
+          medicalReport: true,
+          patientHealthData: true,
+        },
+      },
+      payment: true,
+      schedule: true,
+    },
+
+    skip,
+    take: limit,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? {
+            [options.sortBy]: options.sortOrder,
+          }
+        : {
+            createdAt: "desc",
+          },
+  });
+
+  const total = await prisma.appointment.count({
+    where: {
+      ...(whereConditions as any),
+    },
+  });
+  const meta = {
+    page,
+    limit,
+    total,
+  };
+  return {
+    meta,
+    result,
+  };
+};
 const findPatientMyAppointmentDB = async (
   queryObj: any,
   options: any,
@@ -82,6 +164,12 @@ const findPatientMyAppointmentDB = async (
 ) => {
   const { page, limit, skip } = paginationHelper.calculatePagination(options);
   const { searchTerm, dSpecialties, ...filterData } = queryObj;
+
+  await prisma.admin.findUniqueOrThrow({
+    where: {
+      email: tokenEmail,
+    },
+  });
 
   const andCondition = [];
   if (queryObj.searchTerm) {
@@ -239,4 +327,5 @@ export const appointmentService = {
   createAppointmentDB,
   findPatientMyAppointmentDB,
   findDoctorMyAppointmentDB,
+  findAllAppointmentDB,
 };
