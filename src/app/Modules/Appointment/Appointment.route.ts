@@ -15,5 +15,10 @@ router.get(
   authMiddleWare(UserRole.PATIENT),
   appointmentController.findPatientMyAppointment
 );
+router.get(
+  "/doctor/my-appointments",
+  authMiddleWare(UserRole.DOCTOR),
+  appointmentController.findDoctorMyAppointment
+);
 
 export const appointmentRouter = router;
