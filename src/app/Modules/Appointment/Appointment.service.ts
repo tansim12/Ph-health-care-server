@@ -1,3 +1,5 @@
+import { Prisma } from "@prisma/client";
+import { paginationHelper } from "../../helper/paginationHelper";
 import prisma from "../../shared/prisma";
 import { v4 as uuidv4 } from "uuid";
 
@@ -44,6 +46,7 @@ const createAppointmentDB = async (tokenEmail: string, payload: any) => {
       },
     });
 
+    // update doctorSchedule
     await tx.doctorSchedules.update({
       where: {
         doctorId_scheduleId: {
@@ -57,11 +60,100 @@ const createAppointmentDB = async (tokenEmail: string, payload: any) => {
         appointmentId: createAppointment.id,
       },
     });
+
+    const tnxId = `${uuidv4() + new Date().getMilliseconds()}`;
+    // crate payment
+    const createPayment = await tx.payment.create({
+      data: {
+        amount: Math.ceil(doctorInfo.appointmentFee),
+        transactionId: tnxId,
+        appointmentId: createAppointment.id,
+      },
+    });
     return createAppointment;
   });
   return result;
 };
 
+const findPatientMyAppointmentDB = async (
+  queryObj: any,
+  options: any,
+  tokenEmail: string
+) => {
+  const { page, limit, skip } = paginationHelper.calculatePagination(options);
+  const { searchTerm, dSpecialties, ...filterData } = queryObj;
+
+  const andCondition = [];
+  if (queryObj.searchTerm) {
+    andCondition.push({
+      doctor: {
+        name: {
+          contains: queryObj.searchTerm,
+          mode: "insensitive",
+        },
+      },
+    });
+  }
+
+  if (Object.keys(filterData).length > 0) {
+    andCondition.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: filterData[key as never],
+        },
+      })),
+    });
+  }
+
+  const whereConditions: Prisma.AdminWhereInput = { AND: andCondition as any };
+
+  const result = await prisma.appointment.findMany({
+    where: {
+      ...(whereConditions as any),
+      patient: {
+        email: tokenEmail,
+      },
+    },
+    include: {
+      doctor: true,
+      doctorSchedule: true,
+      patient: true,
+      payment: true,
+      schedule: true,
+    },
+
+    skip,
+    take: limit,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? {
+            [options.sortBy]: options.sortOrder,
+          }
+        : {
+            createdAt: "desc",
+          },
+  });
+
+  const total = await prisma.appointment.count({
+    where: {
+      ...(whereConditions as any),
+      patient: {
+        email: tokenEmail,
+      },
+    },
+  });
+  const meta = {
+    page,
+    limit,
+    total,
+  };
+  return {
+    meta,
+    result,
+  };
+};
+
 export const appointmentService = {
   createAppointmentDB,
+  findPatientMyAppointmentDB,
 };
