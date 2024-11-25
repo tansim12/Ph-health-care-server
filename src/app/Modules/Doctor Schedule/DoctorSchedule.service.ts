@@ -167,7 +167,7 @@ const deleteSingleDoctorScheduleDB = async (
     },
   });
 
-  return result;
+  // return result;
 };
 
 export const doctorScheduleService = {
