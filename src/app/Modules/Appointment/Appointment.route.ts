@@ -13,7 +13,7 @@ router.post(
 router.get(
   "/",
   authMiddleWare(UserRole.ADMIN, UserRole.SUPER_ADMIN),
-  // appointmentController.findAllAppointment
+  appointmentController.findAllAppointment
 );
 router.get(
   "/patient/my-appointments",
